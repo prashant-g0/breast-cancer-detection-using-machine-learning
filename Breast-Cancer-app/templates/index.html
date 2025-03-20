@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast Cancer Prediction</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <header class="text-center mb-4">
+            <h1 class="display-5">Early Detection Saves Lives</h1>
+            <p class="lead">Using Machine Learning to Assist in Diagnosis of Breast Cancer</p>
+            <img src="{{ url_for('static', filename='model_image.jpeg') }}" class="img-fluid rounded" style="width: 60%; height: 40%;" alt="Model Representation">
+        </header>
+        
+        <section class="mb-4">
+            <h3 class="text-center">Features of Our Model</h3>
+            <ul class="list-group">
+                <li class="list-group-item">High accuracy prediction</li>
+                <li class="list-group-item">Uses 29 important features for accurate diagnosis</li>
+                <li class="list-group-item">Accepts both manual and PDF input</li>
+                <li class="list-group-item">Minimalist and user-friendly interface</li>
+            </ul>
+        </section>
+
+        <section class="card p-4 mb-4">
+            <h3 class="text-center">Input Patient Data</h3>
+            <div class="text-center mb-3">
+                <button class="btn btn-primary" id="manual-btn">Manual Entry</button>
+                <button class="btn btn-secondary" id="pdf-btn">Upload PDF</button>
+            </div>
+            
+            <form action="/predict" method="post" enctype="multipart/form-data" id="prediction-form">
+                <div id="manual-entry" class="mb-3" style="display: none;">
+                    {% for feature in feature_names %}
+                        <label for="{{ feature }}" class="form-label">{{ feature.replace('_', ' ').title() }}:</label>
+                        <input type="text" class="form-control" id="{{ feature }}" name="{{ feature }}">
+                    {% endfor %}
+                </div>
+                
+                <div id="pdf-entry" class="mb-3" style="display: none;">
+                    <label for="pdf_file" class="form-label">Upload a Medical Report (PDF):</label>
+                    <input type="file" class="form-control" name="pdf_file" id="pdf_file" accept="application/pdf">
+                </div>
+                
+                <button type="submit" class="btn btn-success">Predict</button>
+            </form>
+            
+            <div id="prediction-result" class="alert alert-info mt-3" style="display: none;"></div>
+        </section>
+
+        <footer class="text-center mt-4 py-3 border-top">
+            <p>&copy; 2025 Breast Cancer Detection. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Show manual entry or PDF upload form
+            $("#manual-btn").click(function() {
+                $("#manual-entry").show();
+                $("#pdf-entry").hide();
+                $("#prediction-result").hide();
+                $("#prediction-form")[0].reset(); // Reset the form
+                $("#manual-entry input").attr("required", true);
+                $("#pdf_file").removeAttr("required");
+            });
+
+            $("#pdf-btn").click(function() {
+                $("#manual-entry").hide();
+                $("#pdf-entry").show();
+                $("#prediction-result").hide();
+                $("#prediction-form")[0].reset(); // Reset the form
+                $("#manual-entry input").removeAttr("required");
+                $("#pdf_file").attr("required", true);
+            });
+
+            // Handle form submission
+            $("#prediction-form").on("submit", function(e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Hide the input form and show the prediction result
+                $("#manual-entry").hide();
+                $("#pdf-entry").hide();
+
+                // Submit the form via AJAX
+                const formData = new FormData(this);
+                console.log("Form data:", formData); // Log form data for debugging
+
+                $.ajax({
+                    url: "/predict",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log("Response from server:", response); // Log server response
+                        // Display the prediction result
+                        $("#prediction-result").html(response.prediction_text).show();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error during AJAX request:", error); // Log error
+                        // Display error message
+                        $("#prediction-result").html("Error: " + xhr.responseText).show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
