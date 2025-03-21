@@ -16,8 +16,8 @@ This project is a **Breast Cancer Prediction Web App** that utilizes **machine l
 ### 1️⃣ Clone the Repository
 
 ```sh
-git clone https://github.com/prashant-g0/breast-cancer-prediction-using-machine-learning.git
-cd breast-cancer-prediction
+git clone https://github.com/prashant-g0/breast-cancer-detection-using-machine-learning.git
+cd Breast-Cancer-app
 ```
 
 ### 2️⃣ Install Required Libraries
