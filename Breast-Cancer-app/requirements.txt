@@ -3,5 +3,3 @@ numpy
 pandas
 joblib
 PyMuPDF
-re
-logging
